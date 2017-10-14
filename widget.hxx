@@ -33,6 +33,9 @@ private:
 public slots:
     void toUtf8();
     void toZhcn();
+    void gbk_to_cn();
+
+
 };
 
 #endif // WIDGET_HXX

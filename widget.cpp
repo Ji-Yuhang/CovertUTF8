@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QTextCodec>
 //int MessageWidget::g_num = 0;
 //MessageWidget::MessageWidget(MessageType type, const QString& title, const QString& content )
 //{
@@ -46,7 +47,8 @@ Widget::Widget(QWidget *parent) :
     
     connect(ui->toutf, SIGNAL(clicked()), this, SLOT(toUtf8()));
     connect(ui->tocn, SIGNAL(clicked()), this, SLOT(toZhcn()));
-    
+    connect(ui->gbk, SIGNAL(clicked()), this, SLOT(gbk_to_cn()));
+
 }
 
 Widget::~Widget()
@@ -105,4 +107,28 @@ void Widget::toZhcn()
     ui->cn->setPlainText(t);
 //    new MessageWidget(MessageWidget::Warning, "I am title", "I am content");
     
+}
+
+void Widget::gbk_to_cn()
+{
+    QString s = ui->utf->toPlainText();
+    QString ss = s.remove("\\x");
+
+
+    QByteArray  block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    for (int i = 0; i < ss.size(); i= i+ 2) {
+        QString mid = ss.mid(i,2);
+        bool ok = false;
+        quint8 bit8 = mid.toUInt(&ok,16);
+        out << bit8;
+    }
+    QTextCodec *gbk = QTextCodec::codecForName("GB18030");
+    QTextCodec *utf8 = QTextCodec::codecForName("UTF-8");
+    QString g2u = gbk->toUnicode(gbk->fromUnicode(block));
+//    QString t = QString::from(block);
+//    QByteArray b = QString::fromUtf8(ss.)
+    ui->cn->setPlainText(g2u);
+//    new MessageWidget(MessageWidget::Warning, "I am title", "I am content");
+
 }
